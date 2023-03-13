@@ -1,5 +1,5 @@
 <template>
-<headerComp />
+<headerComp subHeaderName="List of Current Employers"/>
 <h2 style="text-align:center; color: rebeccapurple;">Current Employer Details</h2>
 <table style="width:60%">
     <thead>

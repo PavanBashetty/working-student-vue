@@ -35,10 +35,17 @@ export default {
                         if ((result[0].user_password == pword) && (res.status == 200)) {
                             localStorage.setItem("user-name", JSON.stringify(result[0].first_name));
                             localStorage.setItem("user-id", JSON.stringify(result[0].user_id));
-                            alert("Login successfull");
-                            this.$router.push({
-                                name: 'dashboardPage'
-                            })
+                            localStorage.setItem("isAdmin", JSON.stringify(result[0].isAdmin));
+                            alert('Login Successfull');
+                            if(result[0].isAdmin == 'true'){
+                                this.$router.push({
+                                    name:'adminPage'
+                                })
+                            }else{
+                                this.$router.push({
+                                    name:'dashboardPage'
+                                })
+                            }
                         } else {
                             alert("Incorrect password");
                             this.password = '';

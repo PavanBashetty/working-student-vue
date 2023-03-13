@@ -1,6 +1,6 @@
 <template>
-    <headerComp />
-    Working hours
+    <headerComp subHeaderName="Working Hours"/>
+    Enter Working hours
 </template>
 
 <script>

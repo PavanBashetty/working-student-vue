@@ -1,5 +1,5 @@
 <template>
-    <headerComp />
+    <headerComp subHeaderName="Dashboard"/>
     dashboard
 </template>
 

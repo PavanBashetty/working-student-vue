@@ -8,6 +8,11 @@ import companyDetailsComp from './components/companyDetailsPage.vue'
 import workingHoursComp from './components/workingHoursPage.vue'
 import userDetailComp from './components/userDetailsPage.vue'
 import employerListComp from './components/employerListPage.vue'
+import adminComp from './components/adminPage.vue'
+import adminDetailsComp from './components/adminDetailsPage.vue'
+import adminArchiveComp from './components/adminArchivePage.vue'
+import adminHeaderComp from './components/adminHeader.vue'
+
 
 const routes = [
     {
@@ -47,13 +52,33 @@ const routes = [
     },
     {
         name:'userDetailPage',
-        path:'/userdetail',
+        path:'/userdetails',
         component: userDetailComp
     },
     {
         name:'employerListPage',
         path:'/employerlist',
         component: employerListComp
+    },
+    {
+        name:'adminPage',
+        path:'/admin',
+        component: adminComp
+    },
+    {
+        name:'adminDetailsPage',
+        path: '/admindetails',
+        component: adminDetailsComp
+    },
+    {
+        name:'adminArchivePage',
+        path:'/adminarchive',
+        component: adminArchiveComp
+    },
+    {
+        name:'adminHeaderPage',
+        path:'/adminheader',
+        component: adminHeaderComp
     }
 ];
 
