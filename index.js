@@ -99,19 +99,20 @@ app.get("/api/workingStudentsList", (req,res)=>{
 });
 
 // GET REST API METHOD TO DISPLAY FILTERED WORKING STUDENT'S DETAILS ON ADMIN PAGE
-app.get("/api/getFilteredData/:searchby/:searchvalue", (req,res)=>{
+app.get("/api/getFilteredData/:searchby/:searchvalue/:workingStatus", (req,res)=>{
     let searchby = req.params.searchby;
     let searchvalue = req.params.searchvalue;
+    let working_status = req.params.workingStatus;
 
     if(searchby == 'user_id'){
         searchby = 'uc.'.concat(searchby);
     }
 
     let query = `SELECT uc.user_id, concat(uc.first_name, " ", uc.last_name) as fullName, uc.university, cd.company_name, cd.type_of_work,
-    DATE(cd.start_date) as start_date, cd.working_status, uc.working_hours  
+    DATE(cd.start_date) as start_date, DATE(cd.end_date) as end_date, cd.working_status, uc.working_hours  
     FROM userCredentials uc
     JOIN companyDetails cd ON uc.user_id = cd.user_id
-    WHERE cd.working_status = 'Active' and ${searchby} = '${searchvalue}' ORDER BY uc.user_id;`
+    WHERE cd.working_status = '${working_status}' and ${searchby} = '${searchvalue}' ORDER BY uc.user_id;`
 
     connection.query(query, (err,result)=>{
         if(err){
@@ -213,27 +214,55 @@ app.get("/api/currentCompList/:user_id",(req,res)=>{
     })
 });
 
-//POST REST API METHOD TO UPDATE END DATE OF A COMPANY FOR USER
+//POST REST API METHOD TO UPDATE END DATE OF A COMPANY FOR USER. 
+//Also, If end date is added to the row with 'Cat01', below POST method will update one of existing "Active" row's income tax bracket to "category 01" based on earliest start date.
+
 app.post("/api/addEndDate", (req,res)=>{
     let user_id = req.body.user_id;
     let end_date = req.body.end_date;
     let company_name = req.body.company_name;
 
-    let queryUpdate = `update companyDetails set end_date = '${end_date}' where user_id = '${user_id}' and company_name = '${company_name}';`
+    let queryEndDateUpdate = `update companyDetails set end_date = '${end_date}', working_status = 'Inactive' where user_id = '${user_id}' and company_name = '${company_name}';`
 
-    connection.query(queryUpdate,(err,result)=>{
+    let queryToCheckAtleastOneCat01Row = `SELECT * FROM companyDetails WHERE user_id = '${user_id}' 
+    and working_status = 'Active' and income_tax_bracket = 'Cat01';`
+
+    let queryToUpdateTaxToCat01 = `UPDATE companyDetails SET income_tax_bracket = 'Cat01' WHERE user_id = ${user_id} and working_status = 'Active' ORDER BY start_date limit 1;`
+
+    connection.query(queryEndDateUpdate,(err,result)=>{
         if(err){
             res.json(500,{
                 msg:"Server issue, could not get the data"
             })
         }
-        res.json(200,{
-            msg:"End date added successfully!"
+        connection.query(queryToCheckAtleastOneCat01Row, (err,result)=>{
+            if(err){
+                res.json(500,{
+                    msg:"Server issue, could not check at least one cat01 row"
+                })
+            }
+            if(result.length < 1){
+                connection.query(queryToUpdateTaxToCat01, (err,result)=>{
+                    if(err){
+                        res.json(500,{
+                            msg:"Server issue, could not update to cat01"
+                        })
+                    }
+                    res.json(200,{
+                        msg:"End date added successfully!"
+                    })
+                })
+            }else{
+                res.json(200,{
+                    msg:"End date added successfully!"
+                })
+            }
         })
     })
 });
 
-// POST REST API METHOD TO ADD NEW COMPANY DETAILS FOR A EMPLOYEE/USER
+// POST REST API METHOD TO ADD NEW COMPANY DETAILS FOR A EMPLOYEE/USER.
+// If the user already has active companies then below POST method will keep newly added row's income tax bracket to 'Cat05' else it will make it 'Cat01'
 app.post("/api/newCompanyEntry",(req,res)=>{
     let user_id = req.body.user_id;
     let company_name = req.body.company_name;
@@ -241,21 +270,120 @@ app.post("/api/newCompanyEntry",(req,res)=>{
     let start_date = req.body.start_date;
     let gross_salary = req.body.gross_salary;
 
-    let insertQuery = `INSERT INTO companyDetails (user_id, company_name, type_of_work, start_date, gross_salary) VALUES('${user_id}', '${company_name}','${type_of_work}','${start_date}', '${gross_salary}');`
+    let rowCount = `SELECT * FROM companyDetails WHERE user_id = '${user_id}' and 
+    working_status = 'Active' and income_tax_bracket = 'Cat01'`;
 
-    connection.query(insertQuery, (err,result)=>{
+    let insertQueryCat01 = `INSERT INTO companyDetails (user_id, company_name, type_of_work, start_date, gross_salary, income_tax_bracket) VALUES('${user_id}', '${company_name}','${type_of_work}','${start_date}', '${gross_salary}', 'Cat01');`
+
+    let insertQueryCat05 = `INSERT INTO companyDetails (user_id, company_name, type_of_work, start_date, gross_salary, income_tax_bracket) VALUES('${user_id}', '${company_name}','${type_of_work}','${start_date}', '${gross_salary}', 'Cat05');`
+
+    connection.query(rowCount,(err,result)=>{
         if(err){
             res.json(500,{
                 msg:"Server issue, could not insert the data"
             })
         }
-        res.json(200,{
-            msg:"New company details added successfully!"
+        if(result.length >= 1){
+            connection.query(insertQueryCat05, (err,result)=>{
+                if(err){
+                    res.json(500,{
+                        msg:"Server issue, could not insert the data"
+                    })
+                }
+                res.json(200,{
+                    msg:"New company details added successfully!"
+                })
+            })
+        }else{
+            connection.query(insertQueryCat01,(err,result)=>{
+                if(err){
+                    res.json(500,{
+                        msg:"Server issue, could not insert the data"
+                    })
+                }
+                res.json(200,{
+                    msg:"New company details added successfully!"
+                })
+            })
+        }
+    })
+
+});
+
+
+// GET REST API METHOD TO RETREIVE LIST OF ACTIVE COMPANY NAMES OF A SPECIFIC USER
+app.get("/api/activeComapanies/:user_id",(req,res)=>{
+
+    let userid = req.params.user_id;
+    let selectQuery = `SELECT company_name FROM companyDetails WHERE user_id = '${userid}' and working_status = 'Active';`
+
+    connection.query(selectQuery, (err,result)=>{
+        if(err){
+            res.json(500,{
+                msg:"Server issue, could not retreive data"
+            })
+        }
+        res.send(200,{
+            msg:"Active companies list fetched successfully!",
+            data:result
         })
     })
-});
+})
+
+// GET REST API METHOD TO RETREIVE ENTERED WORK HOURS FOR AN EMPLOYEE/USER
+app.get("/api/enteredWorkHours/:user_id", (req,res)=>{
+
+    let userid = req.params.user_id;
+    let selectQuery = `SELECT wh.user_id, cd.company_name, wh.worked_date, wh.worked_week, wh.worked_month, wh.hours_worked, cd.working_status
+    FROM workingHours wh
+    JOIN companyDetails cd ON wh.user_id = cd.user_id AND wh.company_name = cd.company_name
+    WHERE wh.user_id = '${userid}';`
+
+    connection.query(selectQuery, (err,result)=>{
+        if(err){
+            res.json(500,{
+                msg:"Server issue, could not reterive data"
+            })
+        }
+        res.send(200,{
+            msg:"Entered worked hours data fetched successfully",
+            data:result
+        })
+    })
+})
+
+// POST REST API METHOD TO ADD A NEW WORKED HOUR DETAILS OF AN EMPLOYEE/USER
+app.post("/api/addNewWorkHourEntry",(req,res)=>{
+    let user_id = req.body.user_id;
+    let company_name = req.body.company_name;
+    let worked_date = req.body.worked_date;
+    let hours_worked = req.body.hours_worked;
+
+    // code to get work week number and month
+    
+    let currWorkDate = new Date(worked_date);
+    let year = new Date(currWorkDate.getFullYear(),0,1);
+    let days = Math.floor((currWorkDate - year) / (24 * 60 * 60 * 1000));
+    let worked_week = Math.ceil(days/7);
+    let worked_month = currWorkDate.getMonth()+1;
+    
+    // back to rest api
+    let queryToAddNewWorkHourEntry = `INSERT INTO workingHours VALUES('${user_id}','${company_name}','${worked_date}', '${worked_week}', '${worked_month}', '${hours_worked}');`
+
+    connection.query(queryToAddNewWorkHourEntry, (err,result)=>{
+        if(err){
+            res.json(500,{
+                msg:"something went wrong"
+            })
+        }
+        res.json(200,{
+            msg:"New worked hour entry is successfull!"
+        })
+    })
+
+})
+
 
 
 // IN MOUNTED, use "isAdmin" also to make sure admin stay logged in admin portals and users stay logged in user portal
 // adminArchivePage.vue is identical to adminPage.vue except for one("inactive") option
-// create admin header so to reduce repeated code in components
