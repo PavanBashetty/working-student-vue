@@ -1,11 +1,11 @@
 <template>
-<div style="background-color:brown; padding: 10px">
-    <h1 style="text-align:center">Welcome to Working Student App</h1>
+<div class="text-center" style="background-color:brown; padding: 30px">
+    <h1 class="self-center text-2xl font-bold whitespace-nowrap dark:text-blue">Welcome to Working Student App</h1>
 </div>
 
-<div>
-    <button class="signup" type="button" v-on:click="signUpPage()"><b>SignUp</b></button><br />
-    <button class="login" type="button" v-on:click="loginPage()"><b>Login</b></button><br />
+<div class="flex h-screen items-center justify-center">
+    <button class="text-white bg-gradient-to-r from-cyan-500 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800 font-medium rounded-lg text-lg px-5 py-2.5 text-center mr-1 mb-1" type="button" v-on:click="signUpPage()"><b>SignUp</b></button>
+    <button class="text-white bg-gradient-to-br from-green-400 to-blue-600 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-lg px-5 py-2.5 text-center mr-1 mb-1" type="button" v-on:click="loginPage()"><b>Login</b></button>
 </div>
 
 <footer>
@@ -48,24 +48,5 @@ footer {
     padding: 10px;
     background-color: DarkSalmon;
     color: white;
-}
-.signup, .login{
-    background-color:bisque;
-    border:1px;
-    color: black;
-    padding: 15px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-    position: absolute;
-    top: 25%;
-    left: 46%;
-}
-.login{
-    top: 35%;
-    left: 46%;
 }
 </style>

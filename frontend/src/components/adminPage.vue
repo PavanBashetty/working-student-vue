@@ -1,10 +1,10 @@
 <template>
 <adminHeaderComp subHeaderName="Admin Home" />
 
-<div class="grid grid-flow-col">
-    <div><h3>Filters: </h3></div>
-
-    <div class="py-2 w-40">
+<!-- <div class="grid grid-cols-4 gap-2"> -->
+    <div class="grid mb-2 md:grid-cols-4">
+    <div class="bg-gray-150 p-2 grid-auto-cols"><h3>Filters: </h3></div>
+    <div class="bg-gray-150 p-2 grid-auto-cols">
         <select class="block py-2 w-40 border border-gray-300 bg-white rounded-md shadow-sm sm:text-sm" v-model="searchby">
             <option value="" disabled selected>Select an Header</option>
             <option value="user_id">User ID</option>
@@ -12,10 +12,10 @@
             <option value="company_name">Company Name</option>
         </select>
     </div>
-    <div class="py-2 w-45">
+    <div class="bg-gray-150 p-2 grid-auto-cols">
         <input type="text" class="w-full max-w-md block py-2  border border-gray-300 bg-white rounded-md shadow-sm placeholder-black sm:text-sm gap-4" placeholder="Enter a value.." v-model="searchValue" />
     </div>
-    <div>
+    <div class="bg-gray-150 p-2 grid-auto-cols">
         <button class="text-blue-700 font-semibold  py-1 px-4 border border-gray-500 rounded-full" type="button" ref="submit">Apply</button>
         <button class="text-blue-700 font-semibold  py-1 px-4 border border-gray-500 rounded-full" type="button" v-on:click="resetData()">Reset</button>
     </div>
@@ -23,8 +23,8 @@
 
 <div class="conatiner mx-auto h-64 overflow-y-auto">
     <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-            <tr class="sticky top-0">
+        <thead class="bg-gray-100 sticky top-0 z-10">
+            <tr>
                 <th class="px-1 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">User ID</th>
                 <th class="px-1 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">Full Name</th>
                 <th class="px-1 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">University</th>
@@ -60,7 +60,8 @@ export default {
         return {
             workingStudentsList: {},
             searchby: '',
-            searchValue: ''
+            searchValue: '',
+            workingStatus: 'Active'
         }
     },
     components: {
@@ -80,7 +81,7 @@ export default {
                 })
         },
         async getFilteredData() {
-            await axios.get("/api/getFilteredData/" + this.searchby + "/" + this.searchValue)
+            await axios.get("/api/getFilteredData/" + this.searchby + "/" + this.searchValue+"/"+this.workingStatus)
                 .then((res) => {
                     this.workingStudentsList = res.data.data;
                 })
@@ -102,26 +103,4 @@ export default {
 </script>
 
 <style scoped>
-.search {
-    border: 1px solid grey;
-    border-radius: 5px;
-    height: 20px;
-    width: 25%;
-    padding: 2px 8px 2px 10px;
-    outline: 0;
-    background-color: #f5f5f5;
-}
-
-/* button {
-    background-color: beige;
-    border: none;
-    color: black;
-    padding: 4px 6px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-} */
 </style>

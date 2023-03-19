@@ -1,22 +1,30 @@
 <template>
-<div class="header">
-    <div class="sub-header-one">
-        <div style="text-align: center;">
-            <h1>{{ subHeaderName }}</h1>
-        </div>
-        <div style="text-align: end; font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">
-            <h1>Working Student App </h1>
-        </div>
-    </div>
 
-    <div class="header-right">
-        <button type="button" v-on:click="logout()">Log out</button>
-        <button type="button" v-on:click="getUserDetails()">{{userName}}</button>
-        <button type="button" v-on:click="workingHoursPage()">Enter Working Hrs</button>
-        <button type="button" v-on:click="companyDetailsPage()">Company Details</button>
-        <button type="button" v-on:click="backToMainPage()">Home</button>
-    </div>
-</div>
+<header>
+    <nav class="bg-gray-500 border-gray-200 px-4 lg:px-6 py-4.5 text-white p-5">
+        <div class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
+            <div class="flex items-center">
+                <img src="../assets/employee_app.jpg" class="mr-1 h-6 sm:h-9 rounded-full" alt="Flowbite Logo" />
+                <span class="self-center text-2xl font-bold whitespace-nowrap dark:text-blue">Working Student App</span>
+            </div>
+            <div class="flex items-center lg:order-1">
+                <h1 class="font-serif text-xl font-extralight text-black-600">{{ subHeaderName }}</h1>
+                <button data-collapse-toggle="navbar-sticky" type="button" class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="navbar-sticky" aria-expanded="false"><span class="sr-only">Open main menu</span> <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
+                </button>
+            </div>
+            <div class="hidden justify-between items-center w-full lg:flex lg:w-auto lg:order-2" id="mobile-menu-2">
+                <ul class="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-4 lg:mt-0">
+                    <li><button class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-1 rounded" type="button" v-on:click="backToMainPage()">Home</button></li>
+                    <li><button class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-1 rounded" type="button" v-on:click="companyDetailsPage()">Company Details</button></li>
+                    <li><button class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-1 rounded" type="button" v-on:click="workingHoursPage()">Enter Working Hrs</button></li>
+                    <li><button class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-1 rounded" type="button" v-on:click="getUserDetails()">{{userName}}</button></li>
+                    <li><button class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-1 rounded" type="button" v-on:click="logout()">Log out</button></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+
 </template>
 
 <script>
@@ -69,52 +77,5 @@ export default {
 </script>
 
 <style>
-.header {
-    display: grid;
-    overflow: hidden;
-    grid-template-rows: 5em 2.2em;
-    background-color: #9ccff3;
-    padding: 5px 10px;
-}
 
-.sub-header-one{
-    display: grid;
-    grid-template-columns: 50% 50%;
-}
-
-.header button {
-    float: right;
-    color: black;
-    text-align: center;
-    padding: 5px;
-    text-decoration: none;
-    font-size: 14px;
-    line-height: 15px;
-    border-radius: 0px;
-}
-
-.header button:hover {
-    background-color: #ddd;
-    color: black;
-}
-
-.header-right {
-    float: right;
-}
-
-@media screen and (max-width: 500px) {
-    .header a {
-        float: none;
-        display: block;
-        text-align: left;
-    }
-
-    .header-right {
-        float: none;
-    }
-}
-
-button {
-    cursor: pointer;
-}
 </style>

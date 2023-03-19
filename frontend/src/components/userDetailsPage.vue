@@ -6,6 +6,11 @@
     <p><b>Full Name: </b>{{ fullName }}</p>
     <p><b>Age: </b>{{ age }}</p>
     <p><b>Email: </b>{{ email }}</p>
+    <p>Active companies: </p>
+    <p>Total worked hours: Active/Inactive comapnies</p>
+    <p>Remaining work hours:</p>
+    <p>Inactive companies table [show/hide]:</p>
+    <p>monthly payment per company [gross/net]</p>
 </div>
 </template>
 

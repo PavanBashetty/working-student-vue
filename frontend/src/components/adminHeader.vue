@@ -1,17 +1,28 @@
 <template>
-<div class="header">
-    <div class="sub-header-one">
-        <div style="text-align: center;"><h1>{{ subHeaderName }}</h1></div>
-        <div style="text-align: end; font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;"><h1>Working Student App </h1></div>
-    </div>
+<header>
+    <nav class="bg-gray-500 border-gray-200 px-4 lg:px-6 py-4.5 text-white p-5">
+        <div class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
+            <div class="flex items-center">
+                <img src="../assets/employee_app.jpg" class="mr-1 h-6 sm:h-9 rounded-full" alt="Flowbite Logo" />
+                <span class="self-center text-2xl font-bold whitespace-nowrap dark:text-blue">Working Student App</span>
+            </div>
+            <div class="flex items-center lg:order-1">
+                <h1 class="font-serif text-xl font-extralight text-black-600">{{ subHeaderName }}</h1>
 
-    <div class="header-right">
-        <button type="button" v-on:click="logout()">Log out</button>
-        <button type="button" v-on:click="getAdminDetails()">{{ adminName}}</button>
-        <button type="button" v-on:click="getArchiveData()">Archived Data</button>
-        <button type="button" v-on:click="backToMainPage()">Main</button>
-    </div>
-</div>
+            </div>
+            <div class="hidden justify-between items-center w-full lg:flex lg:w-auto lg:order-2" id="mobile-menu-2">
+                <ul class="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-4 lg:mt-0">
+                    <li><button class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-1 rounded" type="button" v-on:click="backToMainPage()">Main</button></li>
+                    <li><button class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-1 rounded" type="button" v-on:click="getArchiveData()">Archived Data</button></li>
+                    <li><button class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-1 rounded" type="button" v-on:click="getAdminDetails()">{{ adminName}}</button></li>
+                    <li><button class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-1 rounded" type="button" v-on:click="logout()">Log out</button></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+
+
 </template>
 
 <script>
@@ -59,61 +70,4 @@ export default {
 </script>
 
 <style scoped>
-.header {
-    display: grid;
-    overflow: hidden;
-    grid-template-rows: 5em 2.2em;
-    background-color: #9ccff3;
-    padding: 5px 10px;
-}
-
-.sub-header-one{
-    display: grid;
-    grid-template-columns: 50% 50%;
-}
-
-.header button {
-    float: right;
-    color: black;
-    text-align: center;
-    padding: 8px;
-    text-decoration: none;
-    font-size: 14px;
-    line-height: 15px;
-    border-radius: 0px;
-}
-
-.header button:hover {
-    background-color: #ddd;
-    color: black;
-}
-
-.header-right {
-    float: right;
-}
-
-@media screen and (max-width: 500px) {
-    .header a {
-        float: none;
-        display: block;
-        text-align: left;
-    }
-
-    .header-right {
-        float: none;
-    }
-}
-
-button {
-
-    border: none;
-    color: white;
-    padding: 15px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-}
 </style>
