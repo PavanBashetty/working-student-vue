@@ -1,12 +1,12 @@
 CREATE DATABASE srh_05;
 use srh_05;
 
--- Overview table of all employees
--- Employee/User details
--- Login/SignUp/User credentials
+-- Overview table of all employees	OPTIONAL
+-- Employee/User details			DONE
+-- Login/SignUp/User credentials	DONE
 -- working hours table
 -- Tax deducted table
--- Company Details
+-- Company Details					DONE
 
 
 -- User Credentials
@@ -41,7 +41,23 @@ CONSTRAINT `fk_user_id_companyDetails` FOREIGN KEY(user_id) REFERENCES userCrede
 );
 
 
--- Trigger 1 -- To enter income tax details
+-- Working hours tables
+CREATE TABLE workingHours(
+user_id INT(10) NOT NULL,
+company_name VARCHAR(60) NOT NULL,
+worked_date DATE,
+worked_week INT(4),
+worked_month INT(4),
+hours_worked INT(4),
+INDEX `idx_user_id_workingHours` (user_id),
+CONSTRAINT `fk_user_id_workingHours` FOREIGN KEY(user_id) REFERENCES userCredentials(user_id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+
+
+
+/*
+-- Trigger 1 -- To enter income tax details -- Moved the same logic into Node
 DROP TRIGGER IF EXISTS srh_05.incomeTaxCategory;
 DELIMITER //
 CREATE TRIGGER srh_05.incomeTaxCategory
@@ -60,9 +76,10 @@ END IF;
 
 END //
 DELIMITER ;
+*/
 
-
--- Trigger 2 -- To enter working status details
+/*
+-- Trigger 2 -- To enter working status details -- Moved the same logic into Node
 DROP TRIGGER IF EXISTS srh_05.workingStatusUpdate;
 DELIMITER //
 CREATE TRIGGER srh_05.workingStatusUpdate
@@ -86,12 +103,14 @@ END IF;
 
 END //
 DELIMITER ;
+*/
+
 
 -- Trigger 3 -- To calculate tax deductions
 
 
-
--- Trigger 4 -- To make sure atleast one 'Cat01' is present [DOESN'T WORK]
+/* 
+-- Trigger 4 -- To make sure atleast one 'Cat01' is present [DOESN'T WORK] -- Moved the same logic into Node
 DROP TRIGGER IF EXISTS srh_05.atleastOneCat01Row;
 DELIMITER //
 CREATE TRIGGER srh_05.atleastOneCat01Row
@@ -113,7 +132,7 @@ END IF;
 
 END //
 DELIMITER ;
-
+*/
 
 -- Event Schedule
 SET GLOBAL event_scheduler = ON;
