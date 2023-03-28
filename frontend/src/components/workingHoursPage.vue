@@ -1,7 +1,26 @@
 <template>
 <headerComp subHeaderName="Working Hours" />
+
 <!--FILTER DIV-->
-<div>Filters:</div>
+<div class="grid mb-2 grid-cols-4">
+    <!-- <div class="bg-gray-150 p-2 grid-auto-cols">Filters:</div> -->
+    <div class="bg-gray-150 p-2 grid-auto-cols">
+        <select class="block py-2 w-70 border border-gray-300 bg-white rounded-md shadow-sm sm:text-sm" v-model="searchCompanyName">
+            <option value="" disabled selected>Select Company Name</option>
+            <option v-for="(compName, i) in allCompanyList" :key="i" :value="compName.company_name">{{compName.company_name}}</option>
+        </select>
+    </div>
+    <div class="bg-gray-150 p-2 grid-auto-cols">
+        <input type="number" class="w-full max-w-md block py-2  border border-gray-300 bg-white rounded-md shadow-sm placeholder-black sm:text-sm gap-4" v-model="searchWorkedMonth" placeholder="Enter a month number"/>
+    </div>
+    <div class="bg-gray-150 p-2 grid-auto-cols">
+        <button class="text-blue-700 font-semibold  py-1 px-4 border border-gray-500 rounded-full" type="button" ref="submit">Apply</button>
+        <button class="text-blue-700 font-semibold  py-1 px-4 border border-gray-500 rounded-full" type="button" v-on:click="resetData()">Reset</button>
+    </div>
+    <div class="bg-gray-150 p-2 grid-auto-cols">
+        <p>Total worked hours: {{ totalWorkHoursPostFilter }}</p>
+    </div>
+</div>
 
 <!--TABLE TO DISPLAY WORKED HOURS DETAILS FOR EACH COMPANY-->
 <div class="conatiner mx-auto h-64 overflow-y-auto">
@@ -25,7 +44,10 @@
                 <td>{{ workedHour.worked_week }}</td>
                 <td>{{ workedHour.worked_month }}</td>
                 <td>{{ workedHour.hours_worked }}</td>
-                <td><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">{{ workedHour.working_status }}</span></td>
+                <td>
+                    <span v-if="workedHour.working_status == 'Active'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-300 ">{{ workedHour.working_status }}</span>
+                    <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-300">{{ workedHour.working_status }}</span>
+                </td>
             </tr>
         </tbody>
     </table>
@@ -49,7 +71,9 @@
             <label for="companyName" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Company Name:</label>
             <select id="companyName" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" v-model="companyName">
                 <option value="" disabled selected>Select the company name</option>
-                <option :value="compName.company_name" v-for="(compName, i) in activeCompanyList" :key="i">{{compName.company_name}}</option>
+                <option :value="compName.company_name" v-for="(compName, i) in activeCompanyList" :key="i">
+                <span >{{compName.company_name}}</span>
+                </option>
             </select>
         </div>
         <div>
@@ -76,18 +100,22 @@ export default {
     data() {
         return {
             activeCompanyList: {},
+            allCompanyList:{},
             enteredWorkHoursList: {},
             userID: '',
             companyName: '',
             workDate: '',
             hoursWorked: '',
-            showComponent: false
+            showComponent: false,
+            searchCompanyName:'',
+            searchWorkedMonth: '',
+            totalWorkHoursPostFilter:0
         }
     },
     mounted() {
         this.userID = localStorage.getItem("user-id");
         this.getEnteredWorkHourDetails();
-        this.getActiveCompanyList();
+        this.getAllCompanyList();
     },
     methods: {
        async submitNewWorkEntry() {
@@ -122,11 +150,23 @@ export default {
                     console.log("Data could not be retrived");
                 })
         },
-        async getActiveCompanyList(){
-            await axios.get("/api/activeComapanies/"+this.userID)
+        async getFilteredWorkHourDetails(){
+            await axios.get("/api/filteredWorkHours/" + this.userID + "/" + this.searchCompanyName + "/" + this.searchWorkedMonth)
             .then((res)=>{
-                //console.log(res.data.data);
-                this.activeCompanyList = res.data.data;
+                this.enteredWorkHoursList = res.data.data;
+                for(const a of this.enteredWorkHoursList){
+                    this.totalWorkHoursPostFilter += parseInt(a.hours_worked)
+                }
+            })
+            .catch(()=>{
+                console.log("Filtered data could not be retrived");
+            })
+        },
+        async getAllCompanyList(){
+            await axios.get("/api/allComapanies/"+this.userID)
+            .then((res)=>{
+                this.activeCompanyList = res.data.data[0];
+                this.allCompanyList = res.data.data[1];
             })
             .catch(()=>{
                 console.log("Data could not be retreived");
@@ -136,7 +176,16 @@ export default {
             this.companyName = '',
             this.workDate = '',
             this.hoursWorked = ''
+        },
+        resetData(){
+            this.searchCompanyName = '',
+            this.searchWorkedMonth = '',
+            this.getEnteredWorkHourDetails(),
+            this.totalWorkHoursPostFilter = 0
         }
+    },
+    updated(){
+        this.$refs.submit.addEventListener('click', this.getFilteredWorkHourDetails);
     }
 }
 </script>

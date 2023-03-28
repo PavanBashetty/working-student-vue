@@ -87,7 +87,7 @@ export default {
             await axios.get("/api/getFilteredData/" + this.searchby + "/" + this.searchValue + "/" + this.workingStatus)
                 .then((res) => {
                     this.workingStudentsList = res.data.data;
-                    console.log(this.workingStudentsList);
+                    //console.log(this.workingStudentsList);
                 })
                 .catch(() => {
                     console.log("Filtered data could not be retreived");

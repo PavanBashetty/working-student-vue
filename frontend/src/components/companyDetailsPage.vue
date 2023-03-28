@@ -26,7 +26,7 @@
                     <input type="date" ref="endDateInput" class="bg-gray-100" :disabled="editableIndex !== i" @input="addEndDate(i,$event.target.value)" />
                 </td>
                 <td><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">{{ compName.working_status }}</span></td>
-                <td>000</td>
+                <td>{{compName.hours_worked}}</td>
                 <td><button class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-small rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900" type="button" v-on:click="setEditable(i)">Enter End Date</button></td>
             </tr>
         </tbody>

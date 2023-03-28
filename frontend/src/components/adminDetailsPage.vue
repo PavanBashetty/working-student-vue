@@ -1,11 +1,25 @@
 <template>
 <adminHeaderComp subHeaderName="Admin Details"/>
 
-<div>
-    <p><b>Admin ID: </b>{{userID }}</p>
-    <p><b>Full Name: </b>{{ fullName}}</p>
-    <p><b>Age: </b>{{age }}</p>
-    <p><b>Email: </b>{{email }}</p>
+<div class="grid grid-cols-4 gap-1" style="grid-auto-rows: minmax(10px, auto); grid-auto-columns: max-content;">
+    <div class="userDetailsHeader">Admin ID:</div>
+    <div class="border p-2">{{ userID }}</div>
+    <div class="userDetailsHeader">Full Name:</div>
+    <div class="border p-2">{{ fullName }}</div>
+    <div class="userDetailsHeader">Age:</div>
+    <div class="border p-2">{{ age }}</div>
+    <div class="userDetailsHeader">Email:</div>
+    <div class="border p-2">{{ email }}</div>
+</div>
+<br><br><hr>
+
+<div class="grid grid-cols-2 gap-2" style="grid-auto-rows: minmax(10px, auto); grid-auto-columns: max-content;">
+    <div class="grid grid-cols-2 gap-1">
+    <div class="userDetailsHeader bg-purple-400 flex justify-center items-center">Total number of students:</div>
+        <div class="border p-2 flex justify-center items-center">{{ totalStudentCount }}</div>
+        <div class="userDetailsHeader bg-red-400 flex justify-center items-center">Total universities:</div>
+        <div class="border p-2 flex justify-center items-center">{{ totalUniveristyCount }}</div>
+</div>
 </div>
 </template>
 
@@ -20,7 +34,10 @@ export default {
             userID: '',
             fullName: '',
             age: '',
-            email: ''
+            email: '',
+            totalStudentCount: 0,
+            totalUniveristyCount: 0
+
         }
     },
     components:{
@@ -31,7 +48,10 @@ export default {
             this.userID = localStorage.getItem("user-id");
             await axios.get("/api/admindetails/" + this.userID)
                 .then((res) => {
-                    let responseData = res.data.data;
+                    let overallData = res.data.data;
+                    let responseData = overallData[0];
+                    this.totalStudentCount = overallData[1][0].studentCount;
+                    this.totalUniveristyCount = overallData[2][0].universityCount;
                     this.userID = responseData[0].user_id;
                     this.fullName = (responseData[0].first_name).concat(" ", responseData[0].last_name);
                     this.age = responseData[0].age;

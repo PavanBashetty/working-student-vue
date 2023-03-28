@@ -14,6 +14,30 @@
     <button class="submit" type="button" v-on:click="submitData()">Submit</button>
 </div>
 
+<!-- <form >
+    <div class="grid gap-6 mb-6 md:grid-cols-1">
+        <div>
+            <input type="text" class="bg-gray-100 border border-gray-700 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Enter First Name" v-model="firstName">
+        </div>
+        <div>
+            <input type="text" class="bg-gray-100 border border-gray-700 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Enter Last Name" v-model="lastName">
+        </div>
+        <div>
+            <input type="number" class="bg-gray-100 border border-gray-700 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Enter Age" v-model="age">
+        </div>
+        <div>
+            <input type="text" class="bg-gray-100 border border-gray-700 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Enter University" v-model="university">
+        </div>
+        <div>
+            <input type="email" class="bg-gray-100 border border-gray-700 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Enter Email" v-model="email">
+        </div>
+        <div>
+            <input type="text" class="bg-gray-100 border border-gray-700 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Enter Password" v-model="password">
+        </div>
+    </div>
+    <button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" v-on:click="submitData()">Submit</button>
+</form> -->
+
 <div>
     <button class="back" type="button" v-on:click="homePage()">Back</button>
 </div>
@@ -73,6 +97,16 @@ export default {
             })
         }
     }
+    // mounted(){
+    //     //let user = localStorage.getItem("user-name");
+    //     let isAdmin = localStorage.getItem("isAdmin");
+    //     isAdmin = isAdmin.substring(1, (isAdmin.length - 1));
+    //     if(isAdmin == "true"){
+    //      this.$router.push({name:'adminPage'})
+    //     }else{
+    //         this.$router.push({name:'dashboardPage'})
+    //     }
+    // }
 }
 </script>
 
