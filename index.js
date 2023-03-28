@@ -26,7 +26,8 @@ const connection = mysql.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
-    database: process.env.DB_NAME
+    database: process.env.DB_NAME,
+    multipleStatements: true
 });
 
 connection.connect((err)=>{
@@ -132,7 +133,7 @@ app.get("/api/getFilteredData/:searchby/:searchvalue/:workingStatus", (req,res)=
 app.get("/api/admindetails/:userid", (req,res)=>{
 
     let userid = req.params.userid;
-    let query = `SELECT * FROM userCredentials WHERE user_id= '${userid}' and isAdmin = 'true'`;
+    let query = `SELECT * FROM userCredentials WHERE user_id= '${userid}' and isAdmin = 'true'; SELECT count(*) as studentCount from userCredentials WHERE isAdmin = 'false'; SELECT count(DISTINCT university) as universityCount FROM userCredentials WHERE isAdmin = 'false';`
 
     connection.query(query, (err,result)=>{
         if(err){
@@ -195,11 +196,13 @@ app.get("/api/currentCompList/:user_id",(req,res)=>{
 
     let userid = req.params.user_id;
 
+
     let query = `SELECT uc.user_id, cd.company_name, cd.type_of_work,
-    DATE(cd.start_date) as start_date, DATE(cd.end_date) as end_date, cd.working_status
+    DATE(cd.start_date) as start_date, DATE(cd.end_date) as end_date, SUM(wh.hours_worked) as hours_worked, cd.working_status
     FROM userCredentials uc
     JOIN companyDetails cd ON uc.user_id = cd.user_id
-    WHERE cd.user_id='${userid}' AND cd.working_status = 'Active';`
+    JOIN workingHours wh ON cd.user_id = wh.user_id and cd.company_name = wh.company_name
+    WHERE cd.user_id='${userid}' AND cd.working_status = 'Active' GROUP BY cd.company_name;`
 
     connection.query(query, (err,result)=>{
         if(err){
@@ -273,9 +276,11 @@ app.post("/api/newCompanyEntry",(req,res)=>{
     let rowCount = `SELECT * FROM companyDetails WHERE user_id = '${user_id}' and 
     working_status = 'Active' and income_tax_bracket = 'Cat01'`;
 
-    let insertQueryCat01 = `INSERT INTO companyDetails (user_id, company_name, type_of_work, start_date, gross_salary, income_tax_bracket) VALUES('${user_id}', '${company_name}','${type_of_work}','${start_date}', '${gross_salary}', 'Cat01');`
+    let insertQueryCat01 = `INSERT INTO companyDetails (user_id, company_name, type_of_work, start_date, gross_salary, income_tax_bracket) VALUES('${user_id}', '${company_name}','${type_of_work}','${start_date}', '${gross_salary}', 'Cat01'); INSERT INTO workingHours VALUES('${user_id}', '${company_name}', '${start_date}','0','0','0');`
 
-    let insertQueryCat05 = `INSERT INTO companyDetails (user_id, company_name, type_of_work, start_date, gross_salary, income_tax_bracket) VALUES('${user_id}', '${company_name}','${type_of_work}','${start_date}', '${gross_salary}', 'Cat05');`
+    let insertQueryCat05 = `INSERT INTO companyDetails (user_id, company_name, type_of_work, start_date, gross_salary, income_tax_bracket) VALUES('${user_id}', '${company_name}','${type_of_work}','${start_date}', '${gross_salary}', 'Cat05'); INSERT INTO workingHours VALUES('${user_id}', '${company_name}', '${start_date}','0','0','0');`
+
+    // let workingHoursQuery = `INSERT INTO workingHours VALUES('${user_id}', '${company_name}', '${start_date}','0','0','0');`
 
     connection.query(rowCount,(err,result)=>{
         if(err){
@@ -306,16 +311,17 @@ app.post("/api/newCompanyEntry",(req,res)=>{
                 })
             })
         }
+        
     })
 
 });
 
 
 // GET REST API METHOD TO RETREIVE LIST OF ACTIVE COMPANY NAMES OF A SPECIFIC USER
-app.get("/api/activeComapanies/:user_id",(req,res)=>{
+app.get("/api/allComapanies/:user_id",(req,res)=>{
 
     let userid = req.params.user_id;
-    let selectQuery = `SELECT company_name FROM companyDetails WHERE user_id = '${userid}' and working_status = 'Active';`
+    let selectQuery = `SELECT company_name FROM companyDetails WHERE user_id = '${userid}' and working_status = 'Active'; SELECT company_name FROM companyDetails WHERE user_id = '${userid}';`
 
     connection.query(selectQuery, (err,result)=>{
         if(err){
@@ -337,7 +343,7 @@ app.get("/api/enteredWorkHours/:user_id", (req,res)=>{
     let selectQuery = `SELECT wh.user_id, cd.company_name, wh.worked_date, wh.worked_week, wh.worked_month, wh.hours_worked, cd.working_status
     FROM workingHours wh
     JOIN companyDetails cd ON wh.user_id = cd.user_id AND wh.company_name = cd.company_name
-    WHERE wh.user_id = '${userid}';`
+    WHERE wh.user_id = '${userid}' AND wh.worked_week <> '0' ORDER BY wh.worked_date desc;`
 
     connection.query(selectQuery, (err,result)=>{
         if(err){
@@ -351,6 +357,31 @@ app.get("/api/enteredWorkHours/:user_id", (req,res)=>{
         })
     })
 })
+
+// GET REST API METHOD TO GET FILTERED ENTERED WORK HOURS FOR AN EMPLOYEE/USER
+app.get("/api/filteredWorkHours/:user_id/:searchCompanyName/:searchWorkedMonth", (req,res)=>{
+    let userid = req.params.user_id;
+    let searchCompanyName = req.params.searchCompanyName;
+    let searchWorkedMonth = req.params.searchWorkedMonth;
+
+    let filterQuery = `SELECT wh.user_id, cd.company_name, wh.worked_date, wh.worked_week, wh.worked_month, wh.hours_worked, cd.working_status
+    FROM workingHours wh
+    JOIN companyDetails cd ON wh.user_id = cd.user_id AND wh.company_name = cd.company_name
+    WHERE wh.user_id = '${userid}' AND wh.worked_week <> '0' AND wh.company_name = '${searchCompanyName}' AND wh.worked_month = ${searchWorkedMonth} ORDER BY wh.worked_date desc;`
+
+    connection.query(filterQuery, (err,result)=>{
+        if(err){
+            res.json(500,{
+                msg:"Server issue, could not reterive data"
+            })
+        }
+        res.send(200,{
+            msg:"Filtered worked hours data fetched successfully",
+            data:result
+        })
+    })
+})
+
 
 // POST REST API METHOD TO ADD A NEW WORKED HOUR DETAILS OF AN EMPLOYEE/USER
 app.post("/api/addNewWorkHourEntry",(req,res)=>{
@@ -368,7 +399,7 @@ app.post("/api/addNewWorkHourEntry",(req,res)=>{
     let worked_month = currWorkDate.getMonth()+1;
     
     // back to rest api
-    let queryToAddNewWorkHourEntry = `INSERT INTO workingHours VALUES('${user_id}','${company_name}','${worked_date}', '${worked_week}', '${worked_month}', '${hours_worked}');`
+    let queryToAddNewWorkHourEntry = `INSERT INTO workingHours VALUES('${user_id}','${company_name}','${worked_date}', '${worked_week}', '${worked_month}', '${hours_worked}'); UPDATE userCredentials SET working_hours = working_hours - ${hours_worked} WHERE user_id = '${user_id}';`
 
     connection.query(queryToAddNewWorkHourEntry, (err,result)=>{
         if(err){
@@ -384,6 +415,47 @@ app.post("/api/addNewWorkHourEntry",(req,res)=>{
 })
 
 
+// GET ACTIVE/INACTIVE COMPANIES COUNT, TOTAL WORKED HOURS NUMBER
+app.get("/api/getcompanyactivitydetails/:user_id" ,(req,res)=>{
+    
+    let userid = req.params.user_id;
+    let selectQuery = `SELECT SUM(wh.hours_worked) as hours_worked, wh.company_name, cd.working_status 
+    FROM workingHours wh 
+    JOIN companyDetails cd on wh.user_id = cd.user_id AND wh.company_name = cd.company_name
+    WHERE wh.user_id = '${userid}' GROUP BY company_name;`
+
+    connection.query(selectQuery,(err,result)=>{
+        if(err){
+            res.json(500,{
+                msg:"Server issue, could not reterive data"
+            })
+        }
+        res.send(200,{
+            msg:"Companies related activity data fetched successfully",
+            data:result
+        })
+    })
+})
+
+
+// GET REST API METHOD TO RETREIVE DATA FOR GRAPHS
+app.get("/api/dataForGraphs/:user_id", (req,res)=>{
+    let userid = req.params.user_id;
+
+    let graphQuery = `SELECT worked_month, sum(hours_worked) as hours_worked FROM workingHours WHERE user_id = '${userid}' GROUP BY worked_month ORDER BY worked_month;`
+
+    connection.query(graphQuery,(err,result)=>{
+        if(err){
+            res.json(500,{
+                msg:"Server issue, could not reterive data"
+            })
+        }
+        res.send(200,{
+            msg:"Graph related data fetched successfully",
+            data: result
+        })
+    })
+})
 
 // IN MOUNTED, use "isAdmin" also to make sure admin stay logged in admin portals and users stay logged in user portal
 // adminArchivePage.vue is identical to adminPage.vue except for one("inactive") option
