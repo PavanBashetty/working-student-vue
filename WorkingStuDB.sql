@@ -26,7 +26,7 @@ PRIMARY KEY(user_id)
 ALTER TABLE userCredentials AUTO_INCREMENT = 10000;
 
 
--- Company Details. //Create triggers to enter income tax detail and working_status detail
+-- Company Details.
 CREATE TABLE companyDetails(
 user_id INT(10) NOT NULL,
 company_name VARCHAR(60) NOT NULL,
@@ -41,7 +41,7 @@ CONSTRAINT `fk_user_id_companyDetails` FOREIGN KEY(user_id) REFERENCES userCrede
 );
 
 
--- Working hours tables
+-- Working hours table
 CREATE TABLE workingHours(
 user_id INT(10) NOT NULL,
 company_name VARCHAR(60) NOT NULL,
@@ -54,8 +54,49 @@ CONSTRAINT `fk_user_id_workingHours` FOREIGN KEY(user_id) REFERENCES userCredent
 );
 
 
+-- work hour details for graph table
+CREATE TABLE workHourGraph(
+user_id INT(10) NOT NULL,
+worked_month INT(4),
+monthly_worked_hours INT(4),
+INDEX `idx_user_id_workHoursGraph` (user_id),
+CONSTRAINT `fk_user_id_workHoursGraph` FOREIGN KEY(user_id) REFERENCES userCredentials(user_id) ON UPDATE CASCADE ON DELETE CASCADE
+);
 
 
+
+
+
+-- Event Schedules
+	-- To reset working hours for every student
+SET GLOBAL event_scheduler = ON;
+DELIMITER //
+CREATE EVENT reset_working_hours
+ON SCHEDULE 
+	EVERY 1 YEAR
+	STARTS '2023-12-31 23:59:59'
+DO
+	BEGIN
+		UPDATE userCredentials SET working_hours = 960;
+	END //
+DELIMITER ;
+
+	-- To update table workHourGraph with monthly worked hours at the end of every month
+DELIMITER //
+CREATE EVENT insert_into_workHourGraph_table
+ON SCHEDULE 
+	EVERY 1 MONTH
+	STARTS LAST_DAY(CURRENT_TIMESTAMP) + INTERVAL 1 DAY
+DO
+	BEGIN
+		TRUNCATE TABLE workHourGraph;
+		INSERT INTO workHourGraph(user_id, worked_month, monthly_worked_hours)
+		SELECT user_id, worked_month, sum(hours_worked) FROM workingHours WHERE worked_month <> 0 GROUP BY user_id, worked_month ORDER by user_id;
+	END //
+DELIMITER ;
+
+
+select * from workHourGraph;
 /*
 -- Trigger 1 -- To enter income tax details -- Moved the same logic into Node
 DROP TRIGGER IF EXISTS srh_05.incomeTaxCategory;
@@ -134,11 +175,3 @@ END //
 DELIMITER ;
 */
 
--- Event Schedule
-SET GLOBAL event_scheduler = ON;
-
-CREATE EVENT reset_working_hours
-ON SCHEDULE EVERY 1 YEAR
-STARTS '2023-12-31 23:59:59'
-DO
-UPDATE userCredentials SET working_hours = 960;
