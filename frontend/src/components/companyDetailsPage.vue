@@ -94,6 +94,10 @@ export default {
         }
     },
     mounted() {
+        let userName =localStorage.getItem('user-name');
+        if(!userName){
+            return this.$router.push({name:'homePage'})
+        }
         this.userID = localStorage.getItem("user-id");
         this.getCurrentCompList();
         // this.$nextTick(() => {
@@ -103,7 +107,7 @@ export default {
         //         }, 1000);
         //     }
         // });
-
+        //alert(new Date().toLocaleDateString())
     },
     methods: {
         async getCurrentCompList() {

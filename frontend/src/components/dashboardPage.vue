@@ -1,66 +1,68 @@
 <template>
 <headerComp subHeaderName="Dashboard" />
 
-<Bar id="my-chart-id" :options="chartOptions" :data="chartData" />
+<div class="w-full text-center">
+    <canvas ref="myChart" class="mx-auto w-1/2 h-1/2 object-contain"></canvas>
+</div>
 </template>
 
 <script>
-import { Bar } from 'vue-chartjs'
-import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
-ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 import headerComp from '../components/header.vue'
 import axios from 'axios'
+import {
+    ref,
+    onMounted
+} from 'vue'
+import { useRouter } from 'vue-router'
+import Chart from 'chart.js/auto'
+
 export default {
     name: 'dashboardComp',
     components: {
-        headerComp,
-        Bar
+        headerComp
     },
-    data() {
-        return {
-            userID:'',
-            dataForGraphs:{},
-            workedMonths:[],
-            hoursWorked:[],
-            chartData: {
-                labels: [],
-                datasets: [{
-                    data: []
-                }]
-            },
-            chartOptions: {
-                responsive: false,
-                //maintainAspectRatio: true,
-                height: 40,
-                width: 60
-            }
-        }
-    },
-    mounted(){
-        this.userID = localStorage.getItem("user-id");
-        this.getDataforGraphs();
-    },
-    methods:{
-        async getDataforGraphs(){
-            await axios.get("/api/dataForGraphs/"+this.userID)
-            .then((res)=>{
-                this.dataForGraphs = res.data.data;
-                this.chartData.datasets[0].data = []
-                for(const a of this.dataForGraphs){
-                   this.workedMonths.push(a.worked_month)
-                   this.chartData.labels.push(a.worked_month)
-                   this.hoursWorked.push(a.hours_worked)
-                   this.chartData.datasets[0].data.push(a.hours_worked)
+    setup() {
+        const myChart = ref(null)
+        const router = useRouter();
+        onMounted(async () => {
+            try {
+                let userName = localStorage.getItem('user-name');
+                if (!userName) {
+                    router.push('/')
                 }
-
-                console.log(this.chartData.labels);
-                //this.chartData.datasets[0].data = []
-                console.log(this.chartData.datasets[0].data);
-
-            })
-            .catch(()=>{
-                console.log("Data for graphs couldn't be retreived");
-            })
+                const userID = localStorage.getItem("user-id");
+                const response = await axios.get("/api/dataForGraphs/" + userID)
+                const data = response.data.data
+                const labels = data.map(item => item.worked_month)
+                const values = data.map(item => item.hours_worked)
+                const ctx = myChart.value.getContext('2d')
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Monthly Worked Hours',
+                            data: values,
+                            backgroundColor: '#3f51b5',
+                        }, ],
+                    },
+                    options: {
+                        responsive: false,
+                        // scales: {
+                        //     yAxes: [{
+                        //         ticks: {
+                        //             beginAtZero: true,
+                        //         },
+                        //     }, ],
+                        // },
+                    },
+                })
+            } catch (error) {
+                console.error(error)
+            }
+        })
+        return {
+            myChart
         }
     }
 }

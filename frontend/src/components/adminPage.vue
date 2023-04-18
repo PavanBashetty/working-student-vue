@@ -1,9 +1,12 @@
 <template>
 <adminHeaderComp subHeaderName="Admin Home" />
 
+<!--FILTER-->
 <!-- <div class="grid grid-cols-4 gap-2"> -->
-    <div class="grid mb-2 md:grid-cols-4">
-    <div class="bg-gray-150 p-2 grid-auto-cols"><h3>Filters: </h3></div>
+<div class="grid mb-2 md:grid-cols-4">
+    <div class="bg-gray-150 p-2 grid-auto-cols">
+        <h3>Filters: </h3>
+    </div>
     <div class="bg-gray-150 p-2 grid-auto-cols">
         <select class="block py-2 w-40 border border-gray-300 bg-white rounded-md shadow-sm sm:text-sm" v-model="searchby">
             <option value="" disabled selected>Select an Header</option>
@@ -21,6 +24,8 @@
     </div>
 </div>
 
+
+<!--DETAILED TABLE-->
 <div class="conatiner mx-auto h-64 overflow-y-auto">
     <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-100 sticky top-0 z-10">
@@ -68,6 +73,10 @@ export default {
         adminHeaderComp
     },
     mounted() {
+        let userName =localStorage.getItem('user-name');
+        if(!userName){
+            return this.$router.push({name:'homePage'})
+        }
         this.getAllWorkingStuList();
     },
     methods: {
@@ -81,7 +90,7 @@ export default {
                 })
         },
         async getFilteredData() {
-            await axios.get("/api/getFilteredData/" + this.searchby + "/" + this.searchValue+"/"+this.workingStatus)
+            await axios.get("/api/getFilteredData/" + this.searchby + "/" + this.searchValue + "/" + this.workingStatus)
                 .then((res) => {
                     this.workingStudentsList = res.data.data;
                 })

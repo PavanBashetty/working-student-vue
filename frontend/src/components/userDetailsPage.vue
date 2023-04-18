@@ -23,7 +23,7 @@
     </div>
     <div class="grid grid-cols-2 gap-1">
         <div class="userDetailsHeader bg-green-400">Total Hours Worked [Active]</div>
-        <div class="border p-2 flex justify-center items-center bg-green-100">{{ hoursWorkedAtCurrActiveCompanies }}</div>
+        <div class="border p-2 flex justify-center items-center bg-green-100">{{ hoursWorkedAtCurrActiveCompanies}}</div>
         <div class="userDetailsHeader bg-red-400">Total Hours Worked [Inctive]</div>
         <div class="border p-2 flex justify-center items-center bg-red-100">{{ hoursWorkedAtInactiveCompanies }}</div>
         <div class="userDetailsHeader bg-blue-400">Remaining Work Hours:</div>
@@ -85,6 +85,10 @@ export default {
         }
     },
     mounted() {
+        let userName =localStorage.getItem('user-name');
+        if(!userName){
+            return this.$router.push({name:'homePage'})
+        }
         this.userID = localStorage.getItem("user-id");
         this.loaduserDetails();
         this.getCompanyActivityDetails();

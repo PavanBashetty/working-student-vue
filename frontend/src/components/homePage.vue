@@ -33,6 +33,21 @@ export default {
                 name:'aboutUsPage'
             })
         }
+    },
+    mounted(){
+        let isAdmin = localStorage.getItem('isAdmin');
+        if (isAdmin != null) {
+            isAdmin = isAdmin.substring(1, (isAdmin.length - 1));
+            if (isAdmin == 'true') {
+                return this.$router.push({
+                    name: 'adminPage'
+                })
+            } else {
+                return this.$router.push({
+                    name: 'dashboardPage'
+                })
+            }
+        }
     }
 }
 </script>

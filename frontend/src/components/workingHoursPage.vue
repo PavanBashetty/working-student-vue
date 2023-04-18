@@ -55,9 +55,10 @@
 <br />
 <hr />
 
+
 <!--ENTER LATEST WORKED HOUR DETAILS-->
 <div class="text-center">
-    <button class="text-white bg-blue-700 hover:bg-red-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" v-on:click="showComponent = true">Enter Latest Work Hours</button>
+    <button class="text-white bg-blue-700 hover:bg-red-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" v-on:click="activateWorkEntryForm()">Enter Latest Work Hours</button>
     <button class="text-white bg-blue-700 hover:bg-red-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" v-show="showComponent" v-on:click="showComponent = false">Close Below Form</button>
 </div>
 
@@ -113,9 +114,14 @@ export default {
         }
     },
     mounted() {
+        let userName =localStorage.getItem('user-name');
+        if(!userName){
+            return this.$router.push({name:'homePage'})
+        }
         this.userID = localStorage.getItem("user-id");
         this.getEnteredWorkHourDetails();
         this.getAllCompanyList();
+        
     },
     methods: {
        async submitNewWorkEntry() {
@@ -182,6 +188,11 @@ export default {
             this.searchWorkedMonth = '',
             this.getEnteredWorkHourDetails(),
             this.totalWorkHoursPostFilter = 0
+        },
+        activateWorkEntryForm(){
+            this.workDate = new Date().toISOString().split('T')[0],
+            this.showComponent = true;
+            
         }
     },
     updated(){

@@ -63,6 +63,10 @@ export default {
         }
     },
     mounted() {
+        let userName =localStorage.getItem('user-name');
+        if(!userName){
+            return this.$router.push({name:'homePage'})
+        }
         this.loadAdminDetails();
     }
 }

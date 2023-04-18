@@ -62,6 +62,21 @@ export default {
                 name: 'homePage'
             })
         }
+    },
+    mounted(){
+        let isAdmin = localStorage.getItem('isAdmin');
+        if (isAdmin != null) {
+            isAdmin = isAdmin.substring(1, (isAdmin.length - 1));
+            if (isAdmin == 'true') {
+                return this.$router.push({
+                    name: 'adminPage'
+                })
+            } else {
+                return this.$router.push({
+                    name: 'dashboardPage'
+                })
+            }
+        }
     }
 }
 </script>
@@ -75,6 +90,7 @@ export default {
 
 input {
     width: 20%;
+    height: 30%;
     padding: 12px 20px;
     border: 1px solid #ccc;
 }

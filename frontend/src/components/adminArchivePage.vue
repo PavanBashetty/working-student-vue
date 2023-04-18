@@ -71,6 +71,10 @@ export default {
         adminHeaderComp
     },
     mounted(){
+        let userName =localStorage.getItem('user-name');
+        if(!userName){
+            return this.$router.push({name:'homePage'})
+        }
         this.getArchivedWorkingStuList();
     },
     methods: {
