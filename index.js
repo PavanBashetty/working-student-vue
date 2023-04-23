@@ -15,6 +15,7 @@ app.use(express.static(path.join(__dirname, './frontend/dist')));
 var port = process.env.PORT || 3000;
 
 app.listen(port, ()=>{
+    console.log(Intl.DateTimeFormat().resolvedOptions().timeZone);
     console.log("Server started...");
 });
 
@@ -442,7 +443,7 @@ app.get("/api/getcompanyactivitydetails/:user_id" ,(req,res)=>{
 app.get("/api/dataForGraphs/:user_id", (req,res)=>{
     let userid = req.params.user_id;
 
-    let graphQuery = `SELECT worked_month, sum(hours_worked) as hours_worked FROM workingHours WHERE user_id = '${userid}' GROUP BY worked_month ORDER BY worked_month;`
+    let graphQuery = `SELECT worked_month, monthly_worked_hours as hours_worked FROM workHourGraph WHERE user_id = '${userid}' ORDER BY worked_month;`
 
     connection.query(graphQuery,(err,result)=>{
         if(err){
