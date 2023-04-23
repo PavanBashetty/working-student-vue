@@ -21,7 +21,8 @@
                 <td class="px-1 py-1 text-left whitespace-nowrap">{{ compName.user_id }}</td>
                 <td>{{ compName.company_name }}</td>
                 <td>{{ compName.type_of_work }}</td>
-                <td>{{ (compName.start_date).substring(0, (compName.start_date).indexOf('T')) }}</td>
+                <!-- <td>{{ (compName.start_date).substring(0, (compName.start_date).indexOf('T')) }}</td> -->
+                <td>{{ new Date((compName.start_date)).toLocaleDateString('en-DE') }}</td>
                 <td>
                     <input type="date" ref="endDateInput" class="bg-gray-100" :disabled="editableIndex !== i" @input="addEndDate(i,$event.target.value)" />
                 </td>
@@ -53,11 +54,11 @@
         </div>
         <div>
             <label for="startDate" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Start Date:</label>
-            <input type="date" id="startDate" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-1/2 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" v-model="startDate" required>
+            <input type="datetime-local" id="startDate" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-1/2 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" v-model="startDate" required>
         </div>
         <div>
             <label for="grossSalary" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Gross Salary<i>(per hr)</i>:</label>
-            <input type="number" id="grossSalary" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Enter Hourly Salary" v-model="grossSalary" required>
+            <input type="number" step=".01" id="grossSalary" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Enter Hourly Salary" v-model="grossSalary" required>
         </div>
         <div>
             <label for="typeOfWork" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Type of Work:</label>

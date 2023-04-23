@@ -115,10 +115,10 @@ export default {
                     this.companies.push(responseData[i].company_name)
                     if(responseData[i].working_status == "Active"){
                         this.activeCompanyCount++;
-                        this.hoursWorkedAtCurrActiveCompanies += parseInt(responseData[i].hours_worked)
+                        this.hoursWorkedAtCurrActiveCompanies += parseFloat(responseData[i].hours_worked)
                     }else{
                         this.inactiveCompanyCount++;
-                        this.hoursWorkedAtInactiveCompanies += parseInt(responseData[i].hours_worked)
+                        this.hoursWorkedAtInactiveCompanies += parseFloat(responseData[i].hours_worked)
                     }
                 }
                 this.remainingWorkHours = 960 - (this.hoursWorkedAtCurrActiveCompanies + this.hoursWorkedAtInactiveCompanies)

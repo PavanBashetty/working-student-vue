@@ -40,7 +40,8 @@
             <tr v-for="(workedHour,i) in enteredWorkHoursList" :key="i">
                 <td class="px-1 py-1 text-left whitespace-nowrap">{{ workedHour.user_id }}</td>
                 <td>{{ workedHour.company_name }}</td>
-                <td>{{ (workedHour.worked_date).substring(0, (workedHour.worked_date).indexOf('T')) }}</td>
+                <!-- <td>{{ ((workedHour.worked_date).substring(0, (workedHour.worked_date).indexOf('T'))) }}</td> -->
+                <td>{{ (new Date(workedHour.worked_date)).toLocaleDateString('en-DE')}}</td>
                 <td>{{ workedHour.worked_week }}</td>
                 <td>{{ workedHour.worked_month }}</td>
                 <td>{{ workedHour.hours_worked }}</td>
@@ -79,7 +80,7 @@
         </div>
         <div>
             <label for="workHours" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Hours Worked:</label>
-            <input type="number" id="workHours" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" v-model="hoursWorked">
+            <input type="number" step=".1" id="workHours" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" v-model="hoursWorked">
         </div>
         <div>
             <label for="workDate" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Worked Date:</label>
@@ -161,7 +162,8 @@ export default {
             .then((res)=>{
                 this.enteredWorkHoursList = res.data.data;
                 for(const a of this.enteredWorkHoursList){
-                    this.totalWorkHoursPostFilter += parseInt(a.hours_worked)
+                    this.totalWorkHoursPostFilter += parseFloat(a.hours_worked)
+                    console.log(this.totalWorkHoursPostFilter);
                 }
             })
             .catch(()=>{
